@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview Prep 2023</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f1f3f4; /* Google light gray */
+            position: relative;
+            padding-bottom: 60px; /* Adjust this value based on the height of your footer */
+        }
+
+        #header, .styled-header {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 30px;
+        }
+
+        #header span, .styled-header span {
+            color: #4285F4; /* Google blue */
+        }
+        #header span:nth-child(2), .styled-header span:nth-child(2) {
+            color: #DB4437; /* Google red */
+        }
+        #header span:nth-child(3), .styled-header span:nth-child(3) {
+            color: #F4B400; /* Google yellow */
+        }
+        #header span:nth-child(4), .styled-header span:nth-child(4) {
+            color: #4285F4; /* Google blue */
+        }
+        #header span:nth-child(5), .styled-header span:nth-child(5) {
+            color: #0F9D58; /* Google green */
+        }
+        #header span:nth-child(6), .styled-header span:nth-child(6) {
+            color: #DB4437; /* Google red */
+        }
+
+        .month {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .month-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .date-box {
+            width: calc(100% / 7 - 20px);
+            position: relative;
+            overflow: auto;
+            height: 150px;
+            border: 1px solid #4285F4; /* Google blue */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background-color: #FFFFFF; /* White */
+            color: #202124; /* Google dark gray */
+        }
+        .date-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        }
+        .task {
+            display: none;
+            color: #1A73E8; /* Google blue */
+            padding-bottom: 70px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .notes-button, .view-all-tasks-button {
+            display: none;
+            position: absolute;
+            bottom: 5px;
+            width: 95%;
+            padding: 10px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border: none;
+            color: #3C4043;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            font-size: 12px;
+            transition: background-color 0.1s ease-in-out;
+            border-radius: 2px;
+        }
+        .view-all-tasks-button {
+            background-color: #f8f9fa;
+            font-size: 12px;
+            border-radius: 5px;
+            bottom: 45px;
+        }
+        .view-all-tasks-button:hover {
+            color: #F4B400; /* Google yellow */
+            background-color: #0F9D58; /* Google green */
+        }
+        .date-box .notes-button:visible, .date-box .view-all-tasks-button:visible {
+            display: block;
+        }
+        .notes-button:hover {
+            color: #DB4437; /* Google red */
+            background-color: #4285F4; /* Google blue */
+        }
+        .notes-sidebar {
+            position: fixed;
+            right: -100%;
+            top: 0;
+            width: 25%;
+            height: 100%;
+            background-color: white;
+            padding: 20px;
+            border-left: 1px solid #ccc;
+            overflow: auto;
+            transition: right 0.5s;
+        }
+        .notes-sidebar.active {
+            right: 0;
+        }
+
+        #notes-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        #tasks-dialog {
+            display: none;
+            max-width: 80%;
+        }
+        #tasks-dialog .styled-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        #tasks-dialog-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* New Styles for dialog header */
+        .dialog-header {
+            text-align: center;
+            margin-bottom: 10px;
+            margin-right: 200px;
+            font-size: 18px;
+            padding: 5px;
+        }
+        .dialog-header span {
+            display: inline-block;
+        }
+        .dialog-header span:nth-child(1) {
+            color: #4285F4; /* Google blue */
+        }
+        .dialog-header span:nth-child(2) {
+            color: #DB4437; /* Google red */
+        }
+        .dialog-header span:nth-child(3) {
+            color: #F4B400; /* Google yellow */
+        }
+        .dialog-header span:nth-child(4) {
+            color: #4285F4; /* Google blue */
+        }
+        .dialog-header span:nth-child(5) {
+            color: #0F9D58; /* Google green */
+        }
+        .dialog-header span:nth-child(6) {
+            color: #DB4437; /* Google red */
+        }
+
+        /* New styling for prep-button */
+        #prep-button {
+            padding: 10px 15px;
+            background-color: #008CBA; /* Blue */
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+
+        #prep-button:hover {
+            background-color: white;
+            color: black;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #008CBA;
+            width: 100%; /* To span the footer across the window width */
+            height: 50px; /* Adjust this value based on your needs */
+            box-sizing: border-box;
+            padding: 10px;
+            z-index: 1000; /* This will ensure the footer is always on top */
+        }
+
+        .chatgpt-credit {
+            color: white;
+            font-weight: bold;
+            font-family: monospace;
+            margin-right: 10px;
+        }
+
+        #theme-button {
+            cursor: pointer;
+        }
+
+
+        .g-color1 {
+            color: #4285f4;
+        }
+        .g-color2 {
+            color: #34a853;
+        }
+        .g-color3 {
+            color: #fbbc05;
+        }
+        .g-color4 {
+            color: #ea4335;
+        }
+
+
+
+    </style>
+
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+</head>
+<body>
+    <h1 id="header">
+        <span>I</span><span>n</span><span>t</span><span>e</span><span>r</span><span>v</span>iew Prep 2023
+    </h1>
+
+    <div id="footer">
+        <p class="chatgpt-credit">Created using ChatGPT</p>
+        <button id="theme-button">
+            Why the &nbsp;&nbsp;
+            <span style="color: #4285F4;">G</span>
+            <span style="color: #DB4437;">o</span>
+            <span style="color: #F4B400;">o</span>
+            <span style="color: #4285F4;">g</span>
+            <span style="color: #0F9D58;">l</span>
+            <span style="color: #DB4437;">e</span> 
+            &nbsp;&nbsp;theme?
+        </button>
+
+    </div>
+
+    <!-- a dialog to be shown when the theme button is clicked -->
+    <div id="google-message" style="display: none;">
+        <p style="font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 20px;margin-left: 12px;">
+            <b>ngl, everyone wants to switch to 
+            <span class="g-color1">G</span>
+            <span class="g-color2">o</span>
+            <span class="g-color3">o</span>
+            <span class="g-color4">g</span>
+            <span class="g-color2">l</span>
+            <span class="g-color1">e</span>?
+            &nbsp;&nbsp;Chuck the hypocrisy, embrace the cringe.</b>
+        </p>
+    </div>
+
+
+    <button id="prep-button" style="position: absolute; top: 10px; left: 10px;">Prep Materials</button>
+
+    <div id="calendar"></div>
+    <div id="notes-sidebar" class="notes-sidebar"></div>
+    <div id="tasks-dialog"></div>
+
+    <script>
+        $(document).ready(function() {
+            var startDate = { day: 22, month: 5, year: 2023 };
+            var endDate = { day: 22, month: 6, year: 2023 };
+            var currentMonth = startDate.month-1;
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var currentDate = Object.assign({}, startDate);
+
+            var taskData = {
+                '2023-5-22': ['<a href="https://codeforces.com/contest/699/problem/C"><span style = "color:#FFD700"><b>JS</b></span> CF-B 61</a>','<a href="https://codeforces.com/contest/545/problem/C"><span style = "color:#FFD700"><b>JS</b></span> CF-B 62</a>','<a href="https://codeforces.com/contest/550/problem/C"><span style = "color:#FFD700"><b>JS</b></span> CF-B 63</a>','<a href="https://codeforces.com/contest/225/problem/C"><span style = "color:#FFD700"><b>JS</b></span> CF-B 64</a>'],
+                '2023-5-23': ['<a href="https://codeforces.com/contest/262/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 69</a>','<a href="https://codeforces.com/contest/385/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 70</a>','<a href="https://codeforces.com/contest/376/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 71</a>','<a href="https://codeforces.com/contest/352/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 72</a>','<a href="https://codeforces.com/contest/144/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 73</a>'],
+                '2023-5-24': ['<a href="https://codeforces.com/contest/617/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 74</a>','<a href="https://codeforces.com/contest/236/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 75</a>','<a href="https://codeforces.com/contest/514/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 76</a>','<a href="https://codeforces.com/contest/253/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 77</a>','<a href="https://codeforces.com/contest/520/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 78</a>'],
+                '2023-5-25': ['<a href="https://codeforces.com/contest/371/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 86</a>','<a href="https://codeforces.com/contest/445/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 87</a>','<a href="https://codeforces.com/contest/584/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 88</a>','<a href="https://codeforces.com/contest/448/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 89</a>','<a href="https://codeforces.com/contest/716/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 90</a>'],
+                '2023-5-26': ['<a href="https://codeforces.com/contest/544/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 91</a>','<a href="https://codeforces.com/contest/141/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 92</a>','<a href="https://codeforces.com/contest/369/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 93</a>','<a href="https://codeforces.com/contest/791/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 94</a>','<a href="https://codeforces.com/contest/550/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 95</a>'],
+                '2023-5-27': ['<a href="https://codeforces.com/contest/415/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 108</a>','<a href="https://codeforces.com/contest/602/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 109</a>','<a href="https://codeforces.com/contest/614/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 110</a>','<a href="https://codeforces.com/contest/486/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 111</a>','<a href="https://codeforces.com/contest/510/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 112</a>','<a href="https://codeforces.com/contest/337/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 113</a>'],
+                '2023-5-28': ['<a href="https://codeforces.com/contest/493/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 114</a>','<a href="https://codeforces.com/contest/608/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 115</a>','<a href="https://codeforces.com/contest/621/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 116</a>','<a href="https://codeforces.com/contest/580/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 117</a>','<a href="https://codeforces.com/contest/535/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 118</a>','<a href="https://codeforces.com/contest/979/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 119</a>'],
+                '2023-5-29': ['<a href="https://codeforces.com/contest/1009/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 121</a>','<a href="https://codeforces.com/contest/1030/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 122</a>','<a href="https://codeforces.com/contest/1051/problem/B"><span style = "color:#FFD700"><b>JS</b></span> CF-B 123</a>','<a href="http://codeforces.com/gym/101864/problem/M"><span style = "color:#FFD700"><b>JS</b></span> CF-B 124</a>'],
+                '2023-6-5': ['<a href="https://leetcode.com/problems/two-sum/"><span style = "color:#B8860B"><b>B75</b></span> Array P1</a>','<a href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"><span style = "color:#B8860B"><b>B75</b></span> Array P2</a>','<a href="https://leetcode.com/problems/contains-duplicate/"><span style = "color:#B8860B"><b>B75</b></span> Array P3</a>','<a href="https://leetcode.com/problems/product-of-array-except-self/"><span style = "color:#B8860B"><b>B75</b></span> Array P4</a>','<a href="https://leetcode.com/problems/maximum-subarray/"><span style = "color:#B8860B"><b>B75</b></span> Array P5</a>'],
+                '2023-6-6': ['<a href="https://leetcode.com/problems/maximum-product-subarray/"><span style = "color:#B8860B"><b>B75</b></span> Array P6</a>','<a href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"><span style = "color:#B8860B"><b>B75</b></span> Array P7</a>','<a href="https://leetcode.com/problems/search-in-rotated-sorted-array/"><span style = "color:#B8860B"><b>B75</b></span> Array P8</a>','<a href="https://leetcode.com/problems/3sum/"><span style = "color:#B8860B"><b>B75</b></span> Array P9</a>','<a href="https://leetcode.com/problems/container-with-most-water/"><span style = "color:#B8860B"><b>B75</b></span> Array P10</a>'],
+                '2023-6-7': ['<a href="https://leetcode.com/problems/sum-of-two-integers/"><span style = "color:#B8860B"><b>B75</b></span> Binary P1</a>','<a href="https://leetcode.com/problems/number-of-1-bits/"><span style = "color:#B8860B"><b>B75</b></span> Binary P2</a>','<a href="https://leetcode.com/problems/counting-bits/"><span style = "color:#B8860B"><b>B75</b></span> Binary P3</a>','<a href="https://leetcode.com/problems/missing-number/"><span style = "color:#B8860B"><b>B75</b></span> Binary P4</a>','<a href="https://leetcode.com/problems/reverse-bits/"><span style = "color:#B8860B"><b>B75</b></span> Binary P5</a>'],
+                '2023-6-9': ['<a href="https://atcoder.jp/contests/dp/tasks/dp_a"><span style = "color:#4B0082"><b>ATC</b></span> DP A</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_b"><span style = "color:#4B0082"><b>ATC</b></span> DP B</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_c"><span style = "color:#4B0082"><b>ATC</b></span> DP C</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_d"><span style = "color:#4B0082"><b>ATC</b></span> DP D</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_e"><span style = "color:#4B0082"><b>ATC</b></span> DP E</a>'],
+                '2023-6-10': ['<a href="https://atcoder.jp/contests/dp/tasks/dp_f"><span style = "color:#4B0082"><b>ATC</b></span> DP F</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_g"><span style = "color:#4B0082"><b>ATC</b></span> DP G</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_h"><span style = "color:#4B0082"><b>ATC</b></span> DP H</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_i"><span style = "color:#4B0082"><b>ATC</b></span> DP I</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_j"><span style = "color:#4B0082"><b>ATC</b></span> DP J</a>'],
+                '2023-6-11': ['<a href="https://atcoder.jp/contests/dp/tasks/dp_k"><span style = "color:#4B0082"><b>ATC</b></span> DP K</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_l"><span style = "color:#4B0082"><b>ATC</b></span> DP L</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_m"><span style = "color:#4B0082"><b>ATC</b></span> DP M</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_n"><span style = "color:#4B0082"><b>ATC</b></span> DP N</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_o"><span style = "color:#4B0082"><b>ATC</b></span> DP O</a>'],
+                '2023-6-12': ['<a href="https://atcoder.jp/contests/dp/tasks/dp_p"><span style = "color:#4B0082"><b>ATC</b></span> DP P</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_q"><span style = "color:#4B0082"><b>ATC</b></span> DP Q</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_r"><span style = "color:#4B0082"><b>ATC</b></span> DP R</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_s"><span style = "color:#4B0082"><b>ATC</b></span> DP S</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_t"><span style = "color:#4B0082"><b>ATC</b></span> DP T</a>'],
+                '2023-6-13': ['<a href="https://atcoder.jp/contests/dp/tasks/dp_u"><span style = "color:#4B0082"><b>ATC</b></span> DP U</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_v"><span style = "color:#4B0082"><b>ATC</b></span> DP V</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_w"><span style = "color:#4B0082"><b>ATC</b></span> DP W</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_x"><span style = "color:#4B0082"><b>ATC</b></span> DP X</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_y"><span style = "color:#4B0082"><b>ATC</b></span> DP Y</a>','<a href="https://atcoder.jp/contests/dp/tasks/dp_z"><span style = "color:#4B0082"><b>ATC</b></span> DP Z</a>'],
+                '2023-6-14': ['<a href="https://leetcode.com/problems/climbing-stairs/"><span style = "color:#B8860B"><b>B75</b></span> DP P1</a>','<a href="https://leetcode.com/problems/coin-change/"><span style = "color:#B8860B"><b>B75</b></span> DP P2</a>','<a href="https://leetcode.com/problems/longest-increasing-subsequence/"><span style = "color:#B8860B"><b>B75</b></span> DP P3</a>','<a href="https://leetcode.com/problems/longest-common-subsequence/"><span style = "color:#B8860B"><b>B75</b></span> DP P4</a>','<a href="https://leetcode.com/problems/word-break/"><span style = "color:#B8860B"><b>B75</b></span> DP P5</a>'],
+                '2023-6-15': ['<a href="https://leetcode.com/problems/combination-sum-iv/"><span style = "color:#B8860B"><b>B75</b></span> DP P6</a>','<a href="https://leetcode.com/problems/house-robber/"><span style = "color:#B8860B"><b>B75</b></span> DP P7</a>','<a href="https://leetcode.com/problems/house-robber-ii/"><span style = "color:#B8860B"><b>B75</b></span> DP P8</a>','<a href="https://leetcode.com/problems/decode-ways/"><span style = "color:#B8860B"><b>B75</b></span> DP P9</a>','<a href="https://leetcode.com/problems/unique-paths/"><span style = "color:#B8860B"><b>B75</b></span> DP P10</a>','<a href="https://leetcode.com/problems/jump-game/"><span style = "color:#B8860B"><b>B75</b></span> DP P11</a>'],
+                '2023-6-16': ['<a href="https://leetcode.com/problems/clone-graph/"><span style = "color:#B8860B"><b>B75</b></span> Graph P1</a>','<a href="https://leetcode.com/problems/course-schedule/"><span style = "color:#B8860B"><b>B75</b></span> Graph P2</a>','<a href="https://leetcode.com/problems/pacific-atlantic-water-flow/"><span style = "color:#B8860B"><b>B75</b></span> Graph P3</a>'],
+                '2023-6-17': ['<a href="https://leetcode.com/problems/number-of-islands/"><span style = "color:#B8860B"><b>B75</b></span> Graph P4</a>','<a href="https://leetcode.com/problems/longest-consecutive-sequence/"><span style = "color:#B8860B"><b>B75</b></span> Graph P5</a>'],
+                '2023-6-18': ['<a href="https://leetcode.com/problems/insert-interval/"><span style = "color:#B8860B"><b>B75</b></span> Interval P1</a>','<a href="https://leetcode.com/problems/merge-intervals/"><span style = "color:#B8860B"><b>B75</b></span> Interval P2</a>','<a href="https://leetcode.com/problems/non-overlapping-intervals/"><span style = "color:#B8860B"><b>B75</b></span> Interval P3</a>'],
+                 '2023-6-19': ['<a href="https://leetcode.com/problems/set-matrix-zeroes/"><span style = "color:#B8860B"><b>B75</b></span> Matrix P1</a>','<a href="https://leetcode.com/problems/spiral-matrix/"><span style = "color:#B8860B"><b>B75</b></span> Matrix P2</a>','<a href="https://leetcode.com/problems/rotate-image/"><span style = "color:#B8860B"><b>B75</b></span> Matrix P3</a>','<a href="https://leetcode.com/problems/word-search/"><span style = "color:#B8860B"><b>B75</b></span> Matrix P4</a>'],
+                  '2023-6-21': ['<a href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"><span style = "color:#B8860B"><b>B75</b></span> String P1</a>','<a href="https://leetcode.com/problems/longest-repeating-character-replacement/"><span style = "color:#B8860B"><b>B75</b></span> String P2</a>','<a href="https://leetcode.com/problems/minimum-window-substring/"><span style = "color:#B8860B"><b>B75</b></span> String P3</a>','<a href="https://leetcode.com/problems/valid-anagram/"><span style = "color:#B8860B"><b>B75</b></span> String P4</a>','<a href="https://leetcode.com/problems/group-anagrams/"><span style = "color:#B8860B"><b>B75</b></span> String P5</a>'],
+                   '2023-6-22': ['<a href="https://leetcode.com/problems/valid-parentheses/"><span style = "color:#B8860B"><b>B75</b></span> String P6</a>','<a href="https://leetcode.com/problems/valid-palindrome/"><span style = "color:#B8860B"><b>B75</b></span> String P7</a>','<a href="https://leetcode.com/problems/longest-palindromic-substring/"><span style = "color:#B8860B"><b>B75</b></span> String P8</a>','<a href="https://leetcode.com/problems/palindromic-substrings/"><span style = "color:#B8860B"><b>B75</b></span> String P9</a>'],
+                // and so on for other dates...
+            };
+
+            while(currentDate.year < endDate.year || currentDate.month < endDate.month || currentDate.day <= endDate.day) {
+                if (currentDate.month !== currentMonth) {
+                    currentMonth = currentDate.month;
+                    $('#calendar').append('<div class="month"></div>');
+                    $('.month:last-child').append('<div class="month-header">' + monthNames[currentDate.month - 1] + '</div>');
+                }
+
+                var dateKey = currentDate.year + '-' + currentDate.month + '-' + currentDate.day;
+                var tasks = taskData[dateKey] || []; // Use the tasks for the current date, or an empty array if there are no tasks
+
+                var taskHTML = tasks.slice(0, 2).map(function(task, i) {
+                    return '<li>' + task;
+                }).join('') + (tasks.length > 2 ? ',&nbsp;&nbsp;&nbsp;etc.' : '');
+
+                var dateBox = $('<div class="date-box" data-date="' + currentDate.year + '-' + currentDate.month + '-' + currentDate.day + '"><div class="date-text">' + currentDate.day + '</div><div class="task">' + taskHTML + '</div><button class="view-all-tasks-button">View All Tasks</button><button class="notes-button">View Notes</button></div>');
+
+                dateBox.data('tasks', tasks);
+                $('#calendar .month:last-child').append(dateBox);
+
+                dateBox.find('a').on('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                currentDate.day++;
+                if (currentDate.day > 31 && [1, 3, 5, 7, 8, 10, 12].includes(currentDate.month)) {
+                    currentDate.day = 1;
+                    currentDate.month++;
+                } else if (currentDate.day > 30 && [4, 6, 9, 11].includes(currentDate.month)) {
+                    currentDate.day = 1;
+                    currentDate.month++;
+                } else if (currentDate.day > 28 && currentDate.month === 2) {
+                    currentDate.day = 1;
+                    currentDate.month++;
+                }
+                if (currentDate.month > 12) {
+                    currentDate.month = 1;
+                    currentDate.year++;
+                }
+            }
+
+
+
+
+            $('.date-box').on('click', function() {
+                var dateText = $(this).find('.date-text');
+                var tasks = $(this).find('.task');
+                var notesButton = $(this).find('.notes-button');
+                var viewAllTasksButton = $(this).find('.view-all-tasks-button');
+
+                $('.date-box').not(this).removeClass('active');
+                $('.date-box').not(this).find('.date-text').show();
+                $('.date-box').not(this).find('.task, .notes-button, .view-all-tasks-button').hide();
+
+                if (tasks.is(':visible')) {
+                    tasks.hide();
+                    notesButton.hide();
+                    viewAllTasksButton.hide();
+                    dateText.show();
+                } else {
+                    dateText.hide();
+                    tasks.show();
+                    notesButton.show();
+                    viewAllTasksButton.show();
+                }
+                $(this).toggleClass('active');
+            });
+
+            $('input[type=checkbox]').on('click', function(event) {
+                event.stopPropagation();
+            });
+
+            $('.notes-button').on('click', function(event) {
+                event.stopPropagation();
+                var date = $(this).parent().attr('data-date');
+                if ($(this).text() === "View Notes") {
+                    $('#notes-sidebar').html('<h4 class="styled-header"><span>N</span><span>o</span><span>t</span><span>e</span><span>s</span> for ' + date + '</h4><p>No notes for this date yet.</p><button id="notes-close-button" style="position: absolute; top: 0; right: 0;">X</button>');
+                    $('#notes-sidebar').addClass('active');
+                    $('body').css('overflow', 'hidden');
+                    $(this).text('Hide Notes');
+                } else {
+                    $('#notes-sidebar').removeClass('active');
+                    $('body').css('overflow', 'auto');
+                    $(this).text('View Notes');
+                }
+            });
+
+            $(document).on('click', '#notes-close-button', function(event) {
+                event.stopPropagation();
+                $('#notes-sidebar').removeClass('active');
+                $('body').css('overflow', 'auto');
+                $('.notes-button:visible').text('View Notes'); 
+                if ($('#prep-button').text() === 'Hide Prep Materials') {
+                    $('#prep-button').text('Prep Materials');
+                }
+            });
+
+            $('.view-all-tasks-button').on('click', function(event) {
+                event.stopPropagation();
+                var tasks = $(this).parent().data('tasks');
+                var tasksList = '';
+                for (var i = 0; i < tasks.length; i++) {
+                    tasksList += '<li>'+ tasks[i];
+                }
+                $('#tasks-dialog').html('<ul>' + tasksList + '</ul>');
+                $('#tasks-dialog').dialog('open');
+            });
+
+            $('#tasks-dialog').dialog({
+                autoOpen: false,
+                create: function(event, ui) {
+                    var widget = $(this).dialog("widget");
+                    $(".ui-dialog-title", widget)
+                        .html('<div class="dialog-header"><span>A</span><span>l</span><span>l</span> <span>T</span><span>a</span><span>s</span><span>k</span><span>s</span>:</div>');
+                },
+                show: {
+                    effect: "fade",
+                    duration: 500
+                },
+                hide: {
+                    effect: "fade",
+                    duration: 500
+                },
+            });
+
+
+            $('#prep-button').on('click', function(event) {
+                event.stopPropagation();
+                if ($(this).text() === "Prep Materials") {
+                    $('#notes-sidebar').html('<h4 class="styled-header"><span>P</span><span>r</span><span>e</span><span>p</span> <span>M</span><span>a</span><span>t</span><span>e</span><span>r</span><span>i</span><span>a</span><span>l</span><span>s</span></h4><p>We will use the following prep materials:<li><a href="https://codeforces.com/profile/mostafa.saad.fci" style="color:#0000FF"><b>mostafa.saad.fci</b></a>&nbsp;\'s <a href="https://codeforces.com/blog/entry/65133" style="color:#32CD32"><b>Training roadmap for newcomers</b></a>&nbsp;&nbsp;&nbsp;<span style="font-size:13px">(code: <span style = "color:#FFD700"><b>JS</b></span>, i.e., <span style = "color:#FFD700">Junior Sheet</span>)</span></li><br><li><a href="https://leetcode.com/discuss/interview-question/460599/Blind-75-LeetCode-Questions" style="color:#FF8C00"><b>Blind 75 LeetCode Questions</b></a>&nbsp;&nbsp;&nbsp;<span style="font-size:13px">(code: <span style = "color:#B8860B"><b>B75</b></span>)</span></li><br><li><a href="https://atcoder.jp/contests/dp/tasks/" style="color:#800080"><b>Atcoder Educational DP Contest problems</b></a>&nbsp;&nbsp;&nbsp;<span style="font-size:13px">(code: <span style = "color:#4B0082"><b>ATC</b></span>)</span></li><br><br><br>We\'ll also try to do 1-2 Contests <a href="https://codeforces.com/contests" style="color:blue">(CF Rounds)</a> per week to keep up with the speed.</p><button id="notes-close-button" style="position: absolute; top: 0; right: 0;">X</button>');
+                    $('#notes-sidebar').addClass('active');
+                    $('body').css('overflow', 'hidden');
+                    $(this).text('Hide Prep Materials');
+                } else {
+                    $('#notes-sidebar').removeClass('active');
+                    $('body').css('overflow', 'auto');
+                    $(this).text('Prep Materials');
+                }
+            });
+
+            $("#theme-dialog").dialog({
+                autoOpen: false,
+                show: {
+                    effect: "fade",
+                    duration: 500
+                },
+                hide: {
+                    effect: "fade",
+                    duration: 500
+                }
+            });
+
+            $('#theme-button').on('click', function() {
+                event.preventDefault();
+                $('html, body').animate({scrollTop:0}, 'slow');
+                $('#google-message')
+                    .fadeIn(2000)         // Fade in over 2000ms
+                    .delay(750)      // Wait for 3000ms (3 seconds)
+                    .fadeOut(500);       // Fade out over 2000ms
+            });
+
+
+        });
+    </script>
+</body>
+
+
+
+
+
+
+</html>
